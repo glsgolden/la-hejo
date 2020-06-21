@@ -1,21 +1,33 @@
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
+
+import { useAuth } from "../hooks/useAuth";
+import { useCart } from "../hooks/useCart";
+
 import { StyleSheet, TouchableOpacity, View, Text, Image } from "react-native";
 
-const CartIcon = ({ count, style, onPress }) => {
+const CartIcon = ({ style, onPress }) => {
   const { navigate } = useNavigation();
+  const { cartItemsCount } = useCart();
+  const { currentUser } = useAuth();
 
   return (
     <TouchableOpacity
       activeOpacity={0.5}
-      onPress={onPress ? onPress : () => navigate("cart")}
+      onPress={
+        currentUser
+          ? onPress
+            ? onPress
+            : () => navigate("cart")
+          : () => navigate("login")
+      }
     >
       <View style={[styles.container, style]}>
         <Image
           source={require("../assets/images/shopping-cart.png")}
-          style={styles.icon}
+          style={[styles.icon]}
         />
-        {count && (
+        {!onPress && cartItemsCount !== 0 && (
           <View
             style={{
               position: "absolute",
@@ -29,10 +41,12 @@ const CartIcon = ({ count, style, onPress }) => {
               justifyContent: "center",
             }}
           >
-            <Text style={{ color: "#FFF", fontSize: 10 }}>{count}</Text>
+            <Text style={{ color: "#FFF", fontSize: 10 }}>
+              {cartItemsCount}
+            </Text>
           </View>
         )}
-        {!count && (
+        {onPress && (
           <View
             style={{
               position: "absolute",
